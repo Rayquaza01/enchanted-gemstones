@@ -7,7 +7,7 @@ function _init()
 	poke(0x5f2c, 3)
 	cls()
 
-	cartdata("row-enchanted-gemstones")
+	cartdata("r01-enchanted-gemstones")
 
 	scores = {{}, {}}
 
