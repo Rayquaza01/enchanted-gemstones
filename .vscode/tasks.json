@@ -1,0 +1,33 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "export (split files)",
+            "type": "shell",
+            "command": "./bin/pico-mbine.py",
+            "args": [
+                "export",
+                "enchanted-gemstones.p8"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "import (combine files)",
+            "type": "shell",
+            "command": "./bin/pico-mbine.py",
+            "args": [
+                "import",
+                "enchanted-gemstones.p8"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "run cart",
+            "type": "shell",
+            "command": "pico8 -run ~/.lexaloffle/pico-8/carts/enchanted-gemstones.p8",
+            "problemMatcher": []
+        }
+    ]
+}
