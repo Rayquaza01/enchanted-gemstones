@@ -7,13 +7,33 @@ function _init()
 	poke(0x5f2c, 3)
 	cls()
 
+	lookup = "abcdefghijklmnopqrstuvwxyz0123456789!?. "
+
 	cartdata("r01-enchanted-gemstones")
 
 	scores = {{}, {}}
 
 	load_scores()
 
-	init_vars()
+	-- 1: main menu
+	-- 2: high scores
+	-- 3: game
+	game_screen = 1
+
+	menu_gem_colors = {9, 13}
+
+	level = 0
+	mode = 0
+	mode_text = {"marathon", " endless"}
+
+	name_cursor = make_cursor(3)
+	name_char_cursor = make_cursor(27)
+
+	m_cursor = menu_cursor(4)
+
+	hs_cursor = high_score_cursor(2)
+
+	timer = 0
 end
 
 
@@ -57,8 +77,16 @@ function roll_die()
 end
 
 function num_to_char(n)
-	local lookup = "abcdefghijklmnopqrstuvwxyz0123456789!?. "
-	return sub(lookup, n, n + 1)
+	return sub(lookup, n + 1)
+end
+
+function char_to_num(c)
+	for i = 0, #lookup - 1, 1 do
+		if (c == num_to_char(i)) return i
+	end
+end
+
+function save_scores()
 end
 
 function load_scores()
@@ -100,26 +128,4 @@ function make_cursor(n)
 	end
 
 	return this
-end
-
-function init_vars()
-	-- 1: main menu
-	-- 2: high scores
-	-- 3: game
-	game_screen = 1
-
-	menu_gem_colors = {9, 13}
-
-	level = 0
-	mode = 0
-	mode_text = {"marathon", " endless"}
-
-	name_cursor = make_cursor(3)
-	name_char_cursor = make_cursor(27)
-
-	m_cursor = menu_cursor(4)
-
-	hs_cursor = high_score_cursor(2)
-
-	timer = 0
 end
