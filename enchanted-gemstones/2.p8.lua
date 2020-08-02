@@ -37,8 +37,8 @@ function draw_high_scores()
 	hs_cursor.draw()
 
 	for i = 1, 5, 1 do
-		print(scores[hs_cursor.selected + 1][i].name, 6, 17 + (6 * i), 7 + i)
-		print(left_pad(tostr(scores[hs_cursor.selected + 1][i].score), 5, "0"), 30, 17 + (6 * i), 7 + i)
+		print(scores[hs_cursor.selected + 1][i].name, 12, 17 + (6 * i), 7 + i)
+		print(left_pad(tostr(scores[hs_cursor.selected + 1][i].score), 5, "0"), 32, 17 + (6 * i), 7 + i)
 	end
 
 	print("🅾️ to go back", 6, 59, 7)

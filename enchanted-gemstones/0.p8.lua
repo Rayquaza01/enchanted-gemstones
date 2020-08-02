@@ -123,7 +123,6 @@ function load_scores()
 			else
 				scores[m][idx].score = dget(i + offset)
 			end
-			printh(scores[m][idx].name)
 		end
 	end
 end
