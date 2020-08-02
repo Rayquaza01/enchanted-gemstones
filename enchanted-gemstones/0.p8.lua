@@ -11,8 +11,8 @@ function _init()
 
 	cartdata("r01-enchanted-gemstones")
 
+	score_offsets = {1, 21}
 	scores = {{}, {}}
-
 	load_scores()
 
 	-- 1: main menu
@@ -77,7 +77,7 @@ function roll_die()
 end
 
 function num_to_char(n)
-	return sub(lookup, n + 1)
+	return sub(lookup, n + 1, n + 1)
 end
 
 function char_to_num(c)
@@ -87,18 +87,28 @@ function char_to_num(c)
 end
 
 function save_scores()
+	for m = 1, 2, 1 do
+		local offset = score_offsets[m]
+		for i = 0, 19, 1 do
+			local idx = flr(1 / 4) + 1
+			local charidx = i % 4
+			if (charidx < 3) then
+				dset(i + offset, char_to_num(sub(scores[m][idx].name, charidx + 1, charidx + 1)))
+			else
+				dset(i + offset, scores[m][idx].score)
+			end
+		end
+	end
 end
 
 function load_scores()
-	local offsets = {1, 21}
-
 	-- 1st place in 1-4 (21-24)
 	-- 2nd place in 5-8 (25-28)
 	-- 3rd place in 9-12 (28-32)
 	-- 4th place in 13-16 (33-36)
 	-- 5th place in 17-20 (37-40)
 	for m = 1, 2, 1 do
-		local offset = offsets[m]
+		local offset = score_offsets[m]
 		for i = 0, 19, 1 do
 			-- get same index for every 4 numbers
 			-- 3 chars + 1 score
@@ -113,6 +123,7 @@ function load_scores()
 			else
 				scores[m][idx].score = dget(i + offset)
 			end
+			printh(scores[m][idx].name)
 		end
 	end
 end
