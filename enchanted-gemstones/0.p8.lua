@@ -62,6 +62,14 @@ end
 
 -- misc functions
 
+function change_screen(gs)
+	if (gs == 3) then
+		reset_game()
+	end
+
+	game_screen = gs
+end
+
 function left_pad(s, len, append)
 	if (#s >= len) return s
 

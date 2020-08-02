@@ -26,8 +26,8 @@ function update_menu()
 	if (btnp(🅾️)) then
 		if (m_cursor.selected == 0) level = (level + 1) % 10
 		if (m_cursor.selected == 1) mode = (mode + 1) % 2
-		if (m_cursor.selected == 2) game_screen = 2
-		if (m_cursor.selected == 3) game_screen = 3
+		if (m_cursor.selected == 2) change_screen(2)
+		if (m_cursor.selected == 3) change_screen(3)
 	end
 	if (btnp(➡️)) then
 		if (m_cursor.selected == 0) level = (level + 1) % 10
@@ -37,8 +37,8 @@ function update_menu()
 	if (btnp(❎)) then
 		if (m_cursor.selected == 0) level = (level - 1) % 10
 		if (m_cursor.selected == 1) mode = (mode - 1) % 2
-		if (m_cursor.selected == 2) game_screen = 2
-		if (m_cursor.selected == 3) game_screen = 3
+		if (m_cursor.selected == 2) change_screen(2)
+		if (m_cursor.selected == 3) change_screen(3)
 	end
 	if (btnp(⬅️)) then
 		if (m_cursor.selected == 0) level = (level - 1) % 10
