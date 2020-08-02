@@ -1,6 +1,29 @@
 -- game board
 -- game_screen 3
 
+function make_blocks(special)
+	local this = {}
+
+	this.posx = 4
+	this.posy = 1
+
+	this.blocks = {}
+	for i = 1, 3, 1 do
+		if (special) then
+			this.blocks[i] = 0
+		else
+			this.blocks[i] = roll_die()
+		end
+	end
+
+	this.rotate = function()
+		add(this.blocks, this.blocks[3], 1)
+		deli(this.blocks, 4)
+	end
+
+	return this
+end
+
 function reset_game()
 	game = {}
 	game.width = 6
@@ -11,9 +34,6 @@ function reset_game()
 
 	game.nextx = 52
 	game.nexty = 15
-
-	game.startx = 4
-	game.starty = 3
 
 	game.timer = 0
 
