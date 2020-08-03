@@ -19,6 +19,7 @@ function _init()
 	-- 2: high scores
 	-- 3: game
 	game_screen = 1
+	timer = 0
 
 	menu_gem_colors = {9, 13}
 
@@ -33,7 +34,16 @@ function _init()
 
 	hs_cursor = high_score_cursor(2)
 
-	timer = 0
+	-- game consts
+	dy = {-1, -1, 0, 1, 1, 1, 0, -1}
+	dx = {0, 1, 1, 1, 0, -1, -1, -1}
+
+	to_remove = 0x80
+	chain_up = 0x40
+	chain_ur = 0x20
+	chain_r = 0x10
+	chain_dr = 0x08
+	color_mask = 0x07
 end
 
 

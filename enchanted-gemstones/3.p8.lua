@@ -1,6 +1,22 @@
 -- game board
 -- game_screen 3
 
+function find_adjacent(y, x, d, collision)
+	local adj = {}
+	adj.y = y + dy[d]
+	adj.x = x + dx[d]
+
+	if (adj.y > game.height or adj.y < 1 or adj.x > game.width or adj.width < 1) then
+		return false
+	end
+
+	if (collision and (game.board[adj.y][adj.x] & color_mask) == 0) then
+		return false
+	end
+
+	return adj
+end
+
 function make_blocks(special)
 	local this = {}
 
@@ -25,6 +41,8 @@ function make_blocks(special)
 end
 
 function reset_game()
+	to_remove = {}
+
 	game = {}
 	game.width = 6
 	game.height = 13
@@ -36,6 +54,13 @@ function reset_game()
 	game.nexty = 15
 
 	game.timer = 0
+
+	-- states
+	-- 0: block is falling and controlled by player
+	-- 1: look for chains
+	-- 2: chains flash
+	-- 3: gravity
+	game.state = 0
 
 	game.mode = mode
 	game.level = level
