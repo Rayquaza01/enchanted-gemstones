@@ -17,6 +17,26 @@ function find_adjacent(y, x, d, collision)
 	return adj
 end
 
+function make_countdown(n)
+	local this = {}
+	this.max = n
+	this.val = n
+
+	this.subtract = function(s)
+		this.val -= s
+	end
+
+	this.is_finished = function()
+		if (this.val <= 0) then
+			this.val = this.max
+			return true
+		end
+		return false
+	end
+
+	return this
+end
+
 function make_blocks(special)
 	local this = {}
 
@@ -66,6 +86,12 @@ function make_blocks(special)
 	return this
 end
 
+function draw_tile(x, y, val)
+	if (val == 0) return
+	spr(val, 4 * x + 16, 4 * y + 4, .5, .5)
+end
+
+
 function reset_game()
 	to_remove = {}
 
@@ -73,11 +99,11 @@ function reset_game()
 	game.width = 6
 	game.height = 13
 
-	game.x = 20
-	game.y = 8
-
 	game.active = nil
 	game.next = make_blocks()
+
+	game.special_countdown = make_countdown(100)
+	game.level_countdown = make_countdown(100)
 
 	game.timer = 0
 
@@ -116,8 +142,19 @@ end
 
 function update_game()
 	game.timer += 1
-	-- if (game.state == 0) then
-	-- end
+
+	-- if (btnp(⬆️))
+	-- if (btnp(⬇️))
+	-- if (btnp(➡️))
+	-- if (btnp(⬅️))
+
+	if (game.state == 0) then
+		if (game.active == nil) then
+			game.active = game.next
+			game.next = make_blocks(game.special_countdown.is_finished())
+			return
+		end
+	end
 
 	-- tmp return to menu
 	if (btnp(🅾️) or btnp(❎)) game_screen = 1
@@ -146,4 +183,12 @@ function draw_game()
 	-- level
 	print("lvl", 49, 46, 7)
 	print(left_pad(tostr(game.level + 1), 2, "0"), 51, 52, 7)
+
+	-- game board
+
+	for i = 1, game.height, 1 do
+		for j = 1, game.width, 1 do
+			draw_tile(j, i, game.board[i][j] & color_mask)
+		end
+	end
 end
