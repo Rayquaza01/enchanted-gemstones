@@ -139,9 +139,6 @@ function reset_game()
 	left_held = false
 	right_held = false
 	down_held = false
-	-- delayed auto shift
-	-- frames a button must be held before it will repeat
-	das = make_countdown(3)
 	-- auto repeat rate
 	-- frames between repeats
 	arr = make_countdown(5)
@@ -268,52 +265,30 @@ function update_game()
 		end
 
 		-- if button released, but was held last frame
-		-- mark as unheld and reset das and arr
+		-- mark as unheld and reset arr
 		if (not btn(➡️) and right_held) then
 			right_held = false
-			das.reset()
 			arr.reset()
 		elseif (not btn(⬅️) and left_held) then
 			left_held = false
-			das.reset()
 			arr.reset()
 		elseif (not btn(⬇️) and down_held) then
 			down_held = false
-			das.reset()
 			arr.reset()
 		end
 
 		-- if button pressed and was held last frame
 		if (btn(➡️) and right_held) then
-			-- if das hasn't finished
-			if (not rep) then
-				-- empty das 1 time and set repeat to true
-				das.subtract(1)
-				if (das.is_finished()) rep = true
-			else
-				-- subtrack arr,
-				-- do action every time it finishes
-				arr.subtract(1)
-				if (arr.is_finished()) game.active.movex(1)
-			end
+			arr.subtract(1)
+			if (arr.is_finished()) game.active.movex(1)
 		elseif (btn(⬅️) and left_held) then
-			if (not rep) then
-				das.subtract(1)
-				if (das.is_finished()) rep = true
-			else
-				arr.subtract(1)
-				if (arr.is_finished()) game.active.movex(-1)
-			end
+			arr.subtract(1)
+			if (arr.is_finished()) game.active.movex(-1)
 		elseif (btn(⬇️) and down_held) then
-			if (not rep) then
-				das.subtract(1)
-				if (das.is_finished()) rep = true
-			else
-				arr.subtract(1)
-				if (arr.is_finished()) then
-					game.active.movey(true)
-					drop_countdown.reset()
-				end
+			arr.subtract(1)
+			if (arr.is_finished()) then
+				game.active.movey(true)
+				drop_countdown.reset()
 			end
 		end
 	elseif (game.state == 1) then
