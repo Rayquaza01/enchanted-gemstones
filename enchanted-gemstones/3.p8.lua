@@ -164,11 +164,11 @@ function update_game()
 			return
 		end
 
-		if (btnp(🅾️)) game.active.rotate()
-		if (btnp(❎)) game.active.rotate_reverse()
-		if (btnp(⬇️)) game.active.movey()
+		if (btnp(❎)) game.active.rotate()
+		if (btnp(🅾️)) game.active.rotate_reverse()
 		if (btnp(➡️)) game.active.movex(1)
 		if (btnp(⬅️)) game.active.movex(-1)
+		if (btnp(⬇️)) game.active.movey()
 	elseif (game.state == 1) then
 		game.state = 0
 	end
