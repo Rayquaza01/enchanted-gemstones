@@ -26,7 +26,7 @@ function make_blocks(special)
 	this.blocks = {}
 	for i = 1, 3, 1 do
 		if (special) then
-			this.blocks[i] = 0
+			this.blocks[i] = 7
 		else
 			this.blocks[i] = roll_die()
 		end
@@ -100,6 +100,18 @@ function reset_game()
 			game.board[i][j] = 0
 		end
 	end
+end
+
+function init_game()
+	dy = {-1, -1, 0, 1, 1, 1, 0, -1}
+	dx = {0, 1, 1, 1, 0, -1, -1, -1}
+
+	to_remove = 0x80
+	chain_up = 0x40
+	chain_ur = 0x20
+	chain_r = 0x10
+	chain_dr = 0x08
+	color_mask = 0x07
 end
 
 function update_game()

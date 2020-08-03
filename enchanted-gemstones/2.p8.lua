@@ -24,6 +24,10 @@ function high_score_cursor(n)
 	return this
 end
 
+function init_high_scores()
+	hs_cursor = high_score_cursor(2)
+end
+
 function update_high_scores()
 	if (btnp(➡️)) hs_cursor.add(1)
 	if (btnp(⬅️)) hs_cursor.add(-1)

@@ -19,6 +19,11 @@ function menu_cursor(n)
 	return this
 end
 
+function init_menu()
+	m_cursor = menu_cursor(4)
+	menu_gem_colors = {9, 13}
+end
+
 function update_menu()
 	if (btnp(⬆️)) m_cursor.add(-1)
 	if (btnp(⬇️)) m_cursor.add(1)
