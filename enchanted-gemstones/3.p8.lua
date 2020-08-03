@@ -124,6 +124,8 @@ function update_game()
 end
 
 function draw_game()
+	map(9, 0)
+
 	-- high score
 	print("★", 2, 1, 10)
 	print(left_pad(tostr(scores[game.mode + 1][1].score), 5, "0"), 10, 1, 10)

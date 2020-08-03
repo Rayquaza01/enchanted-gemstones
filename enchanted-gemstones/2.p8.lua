@@ -35,6 +35,7 @@ function update_high_scores()
 end
 
 function draw_high_scores()
+	map(0, 0)
 	print("★high scores", 6, 4, 10)
 
 	print(mode_text[hs_cursor.selected + 1], 16, 13, 4)
