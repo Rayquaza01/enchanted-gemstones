@@ -18,7 +18,7 @@ function high_score_cursor(n)
 	end
 
 	this.draw = function()
-		spr(1, this.get_x(), 13, .5, .5, this.selected == 1, false)
+		spr(8, this.get_x(), 13, .5, .5, this.selected == 1, false)
 	end
 
 	return this

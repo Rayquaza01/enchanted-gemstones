@@ -13,7 +13,7 @@ function menu_cursor(n)
 	end
 
 	this.draw = function()
-		spr(1, this.get_x(), this.get_y(), .5, .5)
+		spr(8, this.get_x(), this.get_y(), .5, .5)
 	end
 
 	return this
