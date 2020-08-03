@@ -1,16 +1,16 @@
 -- game board
 -- game_screen 3
 
-function find_adjacent(y, x, d, collision)
+function find_adjacent(x, y, d, collision)
 	local adj = {}
-	adj.y = y + dy[d]
 	adj.x = x + dx[d]
+	adj.y = y + dy[d]
 
-	if (adj.y > game.height or adj.y < 1 or adj.x > game.width or adj.width < 1) then
+	if (adj.y > game.height or adj.y < 1 or adj.x > game.width or adj.x < 1) then
 		return false
 	end
 
-	if (collision and (game.board[adj.y][adj.x] & color_mask) == 0) then
+	if (collision and ((game.board[adj.y][adj.x] & color_mask) > 0)) then
 		return false
 	end
 
@@ -40,8 +40,8 @@ end
 function make_blocks(special)
 	local this = {}
 
-	this.posx = 4
-	this.posy = 1
+	this.x = 4
+	this.y = 1
 
 	this.blocks = {}
 	for i = 1, 3, 1 do
@@ -54,26 +54,29 @@ function make_blocks(special)
 
 	this.movex = function(d)
 		local direction
-		if (d == 1) direction = 2
-		if (d == -1) direction = 6
-		local adj = find_adjacent(this.posy, this.posx, direction, true)
+		if (d == 1) direction = 3
+		if (d == -1) direction = 7
+		local adj = find_adjacent(this.x, this.y, direction, true)
 		if (adj) then
-			this.posy = adj.y
-			this.posx = adj.x
+			this.y = adj.y
+			this.x = adj.x
 		end
 	end
 
 	this.movey = function()
-		local adj = find_adjacent(this.posy, this.posx, 4, true)
+		local adj = find_adjacent(this.x, this.y, 5, true)
 		if (adj) then
-			this.posy = adj.y
-			this.posx = adj.x
+			this.y = adj.y
+			this.x = adj.x
 		else
-			current = {y=this.posy, x=this.posx}
+			current = {y=this.y, x=this.x}
 			for i = 3, 1, -1 do
-				game.board[current.y][current.x] = this.blocks[i]
-				current = find_adjacent(current.y, current.x, 0, false)
+				if (current) then
+					game.board[current.y][current.x] = this.blocks[i]
+					current = find_adjacent(current.x, current.y, 1, false)
+				end
 			end
+			game.active = nil
 			game.state = 1
 		end
 	end
@@ -81,6 +84,11 @@ function make_blocks(special)
 	this.rotate = function()
 		add(this.blocks, this.blocks[3], 1)
 		deli(this.blocks, 4)
+	end
+
+	this.rotate_reverse = function()
+		add(this.blocks, this.blocks[1], 4)
+		deli(this.blocks, 1)
 	end
 
 	return this
@@ -106,6 +114,7 @@ function reset_game()
 	game.level_countdown = make_countdown(100)
 
 	game.timer = 0
+	game.over = false
 
 	-- states
 	-- 0: block is falling and controlled by player
@@ -154,10 +163,18 @@ function update_game()
 			game.next = make_blocks(game.special_countdown.is_finished())
 			return
 		end
+
+		if (btnp(🅾️)) game.active.rotate()
+		if (btnp(❎)) game.active.rotate_reverse()
+		if (btnp(⬇️)) game.active.movey()
+		if (btnp(➡️)) game.active.movex(1)
+		if (btnp(⬅️)) game.active.movex(-1)
+	elseif (game.state == 1) then
+		game.state = 0
 	end
 
 	-- tmp return to menu
-	if (btnp(🅾️) or btnp(❎)) game_screen = 1
+	-- if (btnp(🅾️) or btnp(❎)) game_screen = 1
 end
 
 function draw_game()
@@ -185,6 +202,15 @@ function draw_game()
 	print(left_pad(tostr(game.level + 1), 2, "0"), 51, 52, 7)
 
 	-- game board
+	if (game.active != nil) then
+		local current = {x=game.active.x, y=game.active.y}
+		for i = 3, 1, -1 do
+			if (current) then
+				draw_tile(current.x, current.y, game.active.blocks[i])
+				current = find_adjacent(current.x, current.y, 1)
+			end
+		end
+	end
 
 	for i = 1, game.height, 1 do
 		for j = 1, game.width, 1 do
