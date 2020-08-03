@@ -6,10 +6,12 @@ function find_adjacent(x, y, d, collision)
 	adj.x = x + dx[d]
 	adj.y = y + dy[d]
 
+	-- if adj is outside the bounds of the board
 	if (adj.y > game.height or adj.y < 1 or adj.x > game.width or adj.x < 1) then
 		return false
 	end
 
+	-- if adj is already filled
 	if (collision and ((game.board[adj.y][adj.x] & color_mask) > 0)) then
 		return false
 	end
@@ -19,17 +21,23 @@ end
 
 function make_countdown(n)
 	local this = {}
+	-- maximum value of countdown
 	this.max = n
+	-- current value
 	this.val = n
 
+	-- subtract s from current value
 	this.subtract = function(s)
 		this.val -= s
 	end
 
+	-- reset current value to max
 	this.reset = function()
 		this.val = this.max
 	end
 
+	-- if current value less than 0, reset countdown
+	-- and return true
 	this.is_finished = function()
 		if (this.val <= 0) then
 			this.reset()
@@ -44,12 +52,15 @@ end
 function make_blocks(special, valid)
 	local this = {}
 
+	-- block starting position (bottom block)
 	this.x = 4
 	this.y = 1
 
+	-- if blocks are still movable
 	this.valid = valid
 
 	this.blocks = {}
+	-- fill blocks
 	for i = 1, 3, 1 do
 		if (special) then
 			this.blocks[i] = 7
@@ -58,6 +69,7 @@ function make_blocks(special, valid)
 		end
 	end
 
+	-- place blocks on board
 	this.lock = function()
 		current = {y=this.y, x=this.x}
 		for i = 3, 1, -1 do
@@ -70,6 +82,7 @@ function make_blocks(special, valid)
 		game.state = 1
 	end
 
+	-- move left and right
 	this.movex = function(d)
 		local direction
 		if (d == 1) direction = 3
@@ -81,6 +94,9 @@ function make_blocks(special, valid)
 		end
 	end
 
+	-- move down
+	-- if lock is true, the blocks will lock into place if possible
+	-- if query is true, this will return if the blocks are lockable
 	this.movey = function(lock, query)
 		local adj = find_adjacent(this.x, this.y, 5, true)
 		if (not query and adj) then
@@ -108,6 +124,8 @@ function make_blocks(special, valid)
 	return this
 end
 
+-- draw tile on board
+-- co-ords based on game.board
 function draw_tile(x, y, val)
 	if (val == 0) return
 	spr(val, 4 * x + 16, 4 * y + 4, .5, .5)
@@ -117,10 +135,15 @@ end
 function reset_game()
 	to_remove = {}
 
+	-- was button held
 	left_held = false
 	right_held = false
 	down_held = false
-	das = make_countdown(5)
+	-- delayed auto shift
+	-- frames a button must be held before it will repeat
+	das = make_countdown(3)
+	-- auto repeat rate
+	-- frames between repeats
 	arr = make_countdown(5)
 	rep = false
 
@@ -172,22 +195,28 @@ function init_game()
 end
 
 function update_game()
-	-- if (btnp(⬆️))
-	-- if (btnp(⬇️))
-	-- if (btnp(➡️))
-	-- if (btnp(⬅️))
-
+	-- block is falling
 	if (game.state == 0) then
+		if (game.board[1][4] != 0) then
+			game.over = true
+			return
+		end
+
+		-- if no drop countdown (game/level just started)
 		if (drop_countdown == nil) then
 			drop_countdown = make_countdown(flr(-3 * game.level + 31))
 		end
+		-- if current active tile is invalid
 		if (not game.active.valid) then
+			-- move next to active, make new next
 			game.active = game.next
 			game.next = make_blocks(special_countdown.is_finished(), true)
 			return
 		end
 
+		-- if press up
 		if (btnp(⬆️)) then
+			-- hard drop
 			while (game.active.valid) do
 				game.active.movey(true)
 			end
@@ -195,28 +224,37 @@ function update_game()
 
 		-- if tile is at bottom
 		if (drop_countdown.is_finished()) then
+			-- move block down, get if lockable
 			local lockable = game.active.movey()
+			-- if lock timer expired, lock
 			if (lockable) then
 				if (lock_countdown.is_finished()) game.active.lock()
+			-- if not lockable, reset lock timer
 			else
 				lock_countdown.reset()
 			end
 		end
 
+		-- if block is on ground, subtract lock timer every frame
 		if (game.active.movey(false, true)) then
 			lock_countdown.subtract(1)
+		-- if block is in air, reset lock timer
 		else
 			lock_countdown.reset()
 		end
 
+		-- subtract drop timer every frame
 		drop_countdown.subtract(1)
 
+		-- rotate
 		if (btnp(❎)) then
 			game.active.rotate()
 		elseif (btnp(🅾️)) then
 			game.active.rotate_reverse()
 		end
 
+		-- if button pressed for first time
+		-- mark as held, and do action
 		if (btn(➡️) and not right_held) then
 			game.active.movex(1)
 			right_held = true
@@ -225,9 +263,12 @@ function update_game()
 			left_held = true
 		elseif (btn(⬇️) and not down_held) then
 			game.active.movey(true)
+			drop_countdown.reset()
 			down_held = true
 		end
 
+		-- if button released, but was held last frame
+		-- mark as unheld and reset das and arr
 		if (not btn(➡️) and right_held) then
 			right_held = false
 			das.reset()
@@ -242,11 +283,16 @@ function update_game()
 			arr.reset()
 		end
 
+		-- if button pressed and was held last frame
 		if (btn(➡️) and right_held) then
+			-- if das hasn't finished
 			if (not rep) then
+				-- empty das 1 time and set repeat to true
 				das.subtract(1)
 				if (das.is_finished()) rep = true
 			else
+				-- subtrack arr,
+				-- do action every time it finishes
 				arr.subtract(1)
 				if (arr.is_finished()) game.active.movex(1)
 			end
@@ -270,7 +316,6 @@ function update_game()
 				end
 			end
 		end
-
 	elseif (game.state == 1) then
 		game.state = 0
 	end
