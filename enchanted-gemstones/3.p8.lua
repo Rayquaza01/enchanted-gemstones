@@ -32,6 +32,32 @@ function make_blocks(special)
 		end
 	end
 
+	this.movex = function(d)
+		local direction
+		if (d == 1) direction = 2
+		if (d == -1) direction = 6
+		local adj = find_adjacent(this.posy, this.posx, direction, true)
+		if (adj) then
+			this.posy = adj.y
+			this.posx = adj.x
+		end
+	end
+
+	this.movey = function()
+		local adj = find_adjacent(this.posy, this.posx, 4, true)
+		if (adj) then
+			this.posy = adj.y
+			this.posx = adj.x
+		else
+			current = {y=this.posy, x=this.posx}
+			for i = 3, 1, -1 do
+				game.board[current.y][current.x] = this.blocks[i]
+				current = find_adjacent(current.y, current.x, 0, false)
+			end
+			game.state = 1
+		end
+	end
+
 	this.rotate = function()
 		add(this.blocks, this.blocks[3], 1)
 		deli(this.blocks, 4)
@@ -50,8 +76,8 @@ function reset_game()
 	game.x = 20
 	game.y = 8
 
-	game.nextx = 52
-	game.nexty = 15
+	game.active = nil
+	game.next = make_blocks()
 
 	game.timer = 0
 
@@ -78,6 +104,9 @@ end
 
 function update_game()
 	game.timer += 1
+	-- if (game.state == 0) then
+	-- end
+
 	-- tmp return to menu
 	if (btnp(🅾️) or btnp(❎)) game_screen = 1
 end
@@ -93,4 +122,8 @@ function draw_game()
 
 	print("lvl", 49, 46, 7)
 	print(left_pad(tostr(game.level + 1), 2, "0"), 51, 52, 7)
+
+	for i = 1, 3, 1 do
+		spr(game.next.blocks[i], 52, 11 + (4 * i), .5, .5)
+	end
 end
