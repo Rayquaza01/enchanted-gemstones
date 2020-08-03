@@ -112,18 +112,24 @@ function update_game()
 end
 
 function draw_game()
+	-- high score
 	print("★", 2, 1, 10)
 	print(left_pad(tostr(scores[game.mode + 1][1].score), 5, "0"), 10, 1, 10)
+
+	-- current score
 	print(left_pad(tostr(game.score), 5, "0"), 43, 1, 7)
+
+	-- next peice
 	print("next", 47, 9, 7)
-
-	print("gems", 47, 31, 7)
-	print(left_pad(tostr(game.gems), 4, "0"), 47, 37, 7)
-
-	print("lvl", 49, 46, 7)
-	print(left_pad(tostr(game.level + 1), 2, "0"), 51, 52, 7)
-
 	for i = 1, 3, 1 do
 		spr(game.next.blocks[i], 52, 11 + (4 * i), .5, .5)
 	end
+
+	-- gem count
+	print("gems", 47, 31, 7)
+	print(left_pad(tostr(game.gems), 4, "0"), 47, 37, 7)
+
+	-- level
+	print("lvl", 49, 46, 7)
+	print(left_pad(tostr(game.level + 1), 2, "0"), 51, 52, 7)
 end
