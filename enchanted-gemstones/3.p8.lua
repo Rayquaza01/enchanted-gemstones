@@ -86,6 +86,7 @@ function make_countdown(n)
 	-- if current value less than 0, reset countdown
 	-- and return true
 	this.is_finished = function(reset)
+		if (reset == nil) reset = true
 		if (this.val <= 0) then
 			if (reset) this.reset()
 			return true
@@ -184,6 +185,8 @@ function move_blocks()
 		game.over = true
 		return
 	end
+
+	if (reset_special) special_countdown.reset()
 
 	-- if no drop countdown (game/level just started)
 	if (drop_countdown == nil) then
@@ -370,6 +373,7 @@ function find_chains()
 		game.score += new_score
 		-- prevent score from underflowing
 		if (game.score < 0) game.score = 32767
+		if (special_countdown.is_finished(false)) reset_special = true
 		special_countdown.subtract(new_score)
 
 		game.state = 2
@@ -433,6 +437,7 @@ function reset_game()
 	arr = make_countdown(5)
 
 	special_countdown = make_countdown(25)
+	reset_special = false
 	drop_countdown = nil
 	lock_countdown = make_countdown(30)
 
