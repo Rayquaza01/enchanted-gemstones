@@ -433,7 +433,7 @@ function draw_game()
 	print(left_pad(tostr(game.level + 1), 2, "0"), 51, 52, 7)
 
 	-- game board
-	if (game.active != nil) then
+	if (game.active.valid) then
 		local current = {x=game.active.x, y=game.active.y}
 		for i = 3, 1, -1 do
 			if (current) then
