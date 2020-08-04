@@ -240,8 +240,8 @@ end
 function find_chains()
 	-- for every tile
 	-- starting from bottom left
-	for i = game.height, 1, -1 do -- height starts from bottom for matching chains
-		for j = 1, game.width, 1 do
+	for j = 1, game.width, 1 do
+		for i = game.height, 1, -1 do -- height starts from bottom for matching chains
 			-- if tile is a color
 			if ((game.board[i][j] & color_mask) > 0) then
 				-- for each chain direction
@@ -309,9 +309,11 @@ function animate_removal()
 				if (not is_set(game.board[adj.y][adj.x], remove_flag)) then
 					printh("removing current, adding adj")
 					deli(to_remove, 1)
+					game.board[adj.y][adj.x] |= remove_flag
 					add(to_remove, adj, 1)
 				else
-					game.board[to_remove[1].y][to_remove[1].x] = 0
+					printh("deferring top level")
+					add(to_remove, to_remove[1])
 					deli(to_remove, 1)
 				end
 			else

@@ -80,7 +80,7 @@ function left_pad(s, len, append)
 end
 
 function roll_die()
-	return 1 + flr(rnd(5))
+	return 1 + flr(rnd(6))
 end
 
 function num_to_char(n)
