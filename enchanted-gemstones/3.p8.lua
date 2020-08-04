@@ -85,9 +85,9 @@ function make_countdown(n)
 
 	-- if current value less than 0, reset countdown
 	-- and return true
-	this.is_finished = function()
+	this.is_finished = function(reset)
 		if (this.val <= 0) then
-			this.reset()
+			if (reset) this.reset()
 			return true
 		end
 		return false
@@ -359,8 +359,7 @@ function find_chains()
 		end -- i loop
 	end -- j loop
 	game.gems += #to_remove
-	level_countdown.subtract(#to_remove)
-	if (level_countdown.is_finished()) then
+	if (game.gems >= level_thresholds[level + 1]) then
 		drop_countdown = nil
 		game.level += 1
 		if (game.level > 9) game.level = 9
@@ -434,7 +433,6 @@ function reset_game()
 	arr = make_countdown(5)
 
 	special_countdown = make_countdown(25)
-	level_countdown = make_countdown(50)
 	drop_countdown = nil
 	lock_countdown = make_countdown(30)
 
@@ -456,6 +454,10 @@ function reset_game()
 
 	game.mode = mode
 	game.level = level
+	game.level_thresholds = {}
+	for i = 1, 10, 1 do
+		game.level_thresholds[i] = 50 * i
+	end
 	game.gems = 0
 	game.score = 0
 	game.multiplier = 1
