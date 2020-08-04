@@ -186,7 +186,10 @@ function move_blocks()
 		return
 	end
 
-	if (reset_special) special_countdown.reset()
+	if (reset_special) then
+		special_countdown.reset()
+		reset_special = false
+	end
 
 	-- if no drop countdown (game/level just started)
 	if (drop_countdown == nil) then
@@ -362,7 +365,7 @@ function find_chains()
 		end -- i loop
 	end -- j loop
 	game.gems += #to_remove
-	if (game.gems >= level_thresholds[level + 1]) then
+	if (game.gems >= game.level_thresholds[game.level + 1]) then
 		drop_countdown = nil
 		game.level += 1
 		if (game.level > 9) game.level = 9
@@ -400,13 +403,7 @@ function animate_removal()
 			local current = decode_pos(to_remove[1])
 			local adj = find_adjacent(current.x, current.y, 1, false)
 			if (adj) then
-				if (not is_set(game.board[adj.y][adj.x], remove_flag)) then
-					game.board[current.y][current.x] = game.board[adj.y][adj.x] & color_mask
-				else
-					-- defer
-					game.board[current.y][current.x] = 0
-					add(to_remove, to_remove[1])
-				end
+				game.board[current.y][current.x] = game.board[adj.y][adj.x] & color_mask
 				printh("removing current, adding adj")
 				printh(game.board[current.y][current.x])
 				deli(to_remove, 1)
