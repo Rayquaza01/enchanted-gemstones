@@ -20,32 +20,10 @@ function decode_pos(pos)
 	return res
 end
 
-function index_of(tbl, val)
-	for i = 1, #tbl, 1 do
-		if (tbl[i] == val) return i
-	end
-	return 0
-end
-
 function set_add(tbl, v, i)
 	if (i == nil) i = #tbl + 1
 	if (index_of(tbl, v) > 0) return
 	add(tbl, v, i)
-end
-
-function insertion_sort(tbl)
-	for i = 1, #tbl, 1 do
-		local j = i
-		while (j > 1 and tbl[j - 1] > tbl[j]) do
-			local tmp = tbl[j]
-			tbl[j] = tbl[j - 1]
-			tbl[j - 1] = tmp
-
-			j -= 1
-		end
-	end
-
-	return tbl
 end
 
 function find_adjacent(x, y, d, collision)
@@ -64,37 +42,6 @@ function find_adjacent(x, y, d, collision)
 	end
 
 	return adj
-end
-
-function make_countdown(n)
-	local this = {}
-	-- maximum value of countdown
-	this.max = n
-	-- current value
-	this.val = n
-
-	-- subtract s from current value
-	this.subtract = function(s)
-		this.val -= s
-	end
-
-	-- reset current value to max
-	this.reset = function()
-		this.val = this.max
-	end
-
-	-- if current value less than 0, reset countdown
-	-- and return true
-	this.is_finished = function(reset)
-		if (reset == nil) reset = true
-		if (this.val <= 0) then
-			if (reset) this.reset()
-			return true
-		end
-		return false
-	end
-
-	return this
 end
 
 function make_blocks(special, valid)
@@ -510,7 +457,7 @@ function update_game()
 	elseif (game.state == 2) then
 		animate_removal()
 	elseif (game.state == 3 or game.state == 4) then
-		-- gameover()
+		-- if (btnp(🅾️) or btnp(❎)) game_screen = 1
 	end
 
 	-- tmp return to menu
