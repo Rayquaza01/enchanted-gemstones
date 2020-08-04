@@ -182,7 +182,7 @@ end
 --game state 0
 function move_blocks()
 	if (game.board[1][4] != 0) then
-		game.over = true
+		game.state = 3
 		return
 	end
 
@@ -365,10 +365,21 @@ function find_chains()
 		end -- i loop
 	end -- j loop
 	game.gems += #to_remove
+	-- prevent gems from overflowing
+	if (game.gems > 9999) game.gems = 9999
+
+	-- detect if level needs to be advanced
 	if (game.gems >= game.level_thresholds[game.level + 1]) then
 		drop_countdown = nil
 		game.level += 1
-		if (game.level > 9) game.level = 9
+		if (game.level > 9) then
+			-- end game after beating level 10 on marathon
+			if (game.mode == 0) then
+				game.state = 4
+				return
+			end
+			game.level = 9
+		end
 	end
 
 	if (#to_remove > 0) then
@@ -445,8 +456,6 @@ function reset_game()
 	game.active = make_blocks(false, false)
 	game.next = make_blocks()
 
-	game.over = false
-
 	-- states
 	-- 0: block is falling and controlled by player
 	-- 1: look for chains
@@ -500,6 +509,8 @@ function update_game()
 	-- flashing objects
 	elseif (game.state == 2) then
 		animate_removal()
+	elseif (game.state == 3 or game.state == 4) then
+		-- gameover()
 	end
 
 	-- tmp return to menu
@@ -549,5 +560,9 @@ function draw_game()
 				draw_tile(j, i, game.board[i][j] & color_mask)
 			end
 		end
+	end
+
+	if (game.state > 2) then
+		print("game\nover", 1, 24, 7)
 	end
 end
