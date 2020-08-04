@@ -12,7 +12,7 @@ function high_score_cursor(n)
 			x += 11
 		end
 
-		x += (timer % 30 > 15) and 1 or 0
+		x += (frame_counter.selected > 14) and 1 or 0
 
 		return x
 	end

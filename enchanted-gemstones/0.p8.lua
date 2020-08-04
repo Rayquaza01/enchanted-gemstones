@@ -19,7 +19,6 @@ function _init()
 	-- 2: high scores
 	-- 3: game
 	game_screen = 1
-	timer = 0
 
 	level = 0
 	mode = 0
@@ -27,6 +26,8 @@ function _init()
 
 	name_cursor = make_cursor(3)
 	name_char_cursor = make_cursor(#lookup)
+
+	frame_counter = make_cursor(30)
 
 	init_menu()
 
@@ -37,7 +38,7 @@ end
 
 
 function _update()
-	timer += 1
+	frame_counter.add(1)
 
 	if (game_screen == 1) then
 		update_menu()

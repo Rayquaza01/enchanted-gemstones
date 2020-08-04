@@ -502,7 +502,7 @@ function draw_game()
 	for i = 1, game.height, 1 do
 		for j = 1, game.width, 1 do
 			if (game.state == 2 and is_set(game.board[i][j], remove_flag)) then
-				draw_tile(j, i, animation.selected)
+				draw_tile(j, i, animation.selected + 1)
 			else
 				draw_tile(j, i, game.board[i][j] & color_mask)
 			end

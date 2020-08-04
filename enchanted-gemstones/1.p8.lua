@@ -5,7 +5,7 @@ function menu_cursor(n)
 	local this = make_cursor(n)
 
 	this.get_x = function()
-		return (timer % 30 > 15) and 1 or 2
+		return (frame_counter.selected > 14) and 1 or 2
 	end
 
 	this.get_y = function()
@@ -53,7 +53,7 @@ end
 
 function draw_menu()
 	map(0, 0)
-	if (timer % 15 == 0) then
+	if (frame_counter.selected == 15) then
 		menu_gem_colors[1] = roll_die() + 9
 		menu_gem_colors[2] = roll_die() + 9
 	end
