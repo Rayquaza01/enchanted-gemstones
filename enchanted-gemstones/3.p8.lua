@@ -135,6 +135,192 @@ function draw_tile(x, y, val)
 	spr(val, 4 * x + 16, 4 * y + 4, .5, .5)
 end
 
+--game state 0
+function move_blocks()
+	if (game.board[1][4] != 0) then
+		game.over = true
+		return
+	end
+
+	-- if no drop countdown (game/level just started)
+	if (drop_countdown == nil) then
+		drop_countdown = make_countdown(flr(-3 * game.level + 31))
+	end
+	-- if current active tile is invalid
+	if (not game.active.valid) then
+		-- move next to active, make new next
+		game.active = game.next
+		game.next = make_blocks(special_countdown.is_finished(), true)
+		return
+	end
+
+	-- if press up
+	if (btnp(⬆️)) then
+		-- hard drop
+		while (game.active.valid) do
+			game.active.movey(true)
+		end
+	end
+
+	-- if tile is at bottom
+	if (drop_countdown.is_finished()) then
+		-- move block down, get if lockable
+		local lockable = game.active.movey()
+		-- if lock timer expired, lock
+		if (lockable) then
+			if (lock_countdown.is_finished()) game.active.lock()
+		-- if not lockable, reset lock timer
+		else
+			lock_countdown.reset()
+		end
+	end
+
+	-- if block is on ground, subtract lock timer every frame
+	if (game.active.movey(false, true)) then
+		lock_countdown.subtract(1)
+	-- if block is in air, reset lock timer
+	else
+		lock_countdown.reset()
+	end
+
+	-- subtract drop timer every frame
+	drop_countdown.subtract(1)
+
+	-- rotate
+	if (btnp(❎)) then
+		game.active.rotate()
+	elseif (btnp(🅾️)) then
+		game.active.rotate_reverse()
+	end
+
+	-- if button pressed for first time
+	-- mark as held, and do action
+	if (btn(➡️) and not right_held) then
+		game.active.movex(1)
+		right_held = true
+	elseif (btn(⬅️) and not left_held) then
+		game.active.movex(-1)
+		left_held = true
+	elseif (btn(⬇️) and not down_held) then
+		game.active.movey(true)
+		drop_countdown.reset()
+		down_held = true
+	end
+
+	-- if button released, but was held last frame
+	-- mark as unheld and reset arr
+	if (not btn(➡️) and right_held) then
+		right_held = false
+		arr.reset()
+	elseif (not btn(⬅️) and left_held) then
+		left_held = false
+		arr.reset()
+	elseif (not btn(⬇️) and down_held) then
+		down_held = false
+		arr.reset()
+	end
+
+	-- if button pressed and was held last frame
+	if (btn(➡️) and right_held) then
+		arr.subtract(1)
+		if (arr.is_finished()) game.active.movex(1)
+	elseif (btn(⬅️) and left_held) then
+		arr.subtract(1)
+		if (arr.is_finished()) game.active.movex(-1)
+	elseif (btn(⬇️) and down_held) then
+		arr.subtract(1)
+		if (arr.is_finished()) then
+			game.active.movey(true)
+			drop_countdown.reset()
+		end
+	end
+end
+
+-- game state 1
+function find_chains()
+	-- for every tile
+	-- starting from bottom left
+	for i = game.height, 1, -1 do -- height starts from bottom for matching chains
+		for j = 1, game.width, 1 do
+			-- if tile is a color
+			if ((game.board[i][j] & color_mask) > 0) then
+				-- for each chain direction
+				for d = 1, 4, 1 do
+					-- chain elements
+					local chain = {{x=j, y=i, color=game.board[i][j] & color_mask}}
+					-- continue until chain is broken
+					while (true) do
+						-- if chain is not already part of chain in direction
+						if (not is_set(game.board[chain[1].y][chain[1].x], chains[d])) then
+							-- get adjacent
+							local adj = find_adjacent(chain[1].x, chain[1].y, d, false)
+							if (adj) then
+								-- get adjacent color
+								adj.color = game.board[adj.y][adj.x] & color_mask
+								-- if colors match, add to chain
+								if (chain[1].color == adj.color) then
+									add(chain, adj, 1)
+								else
+									-- break if colors don't match
+									break
+								end
+							else
+								-- break if adjacent is invalid
+								break
+							end
+						else
+							-- break if chain in this direction already found
+							break
+						end
+					end
+
+					-- if 3 in a row or more found
+					if (#chain >= 3) then
+						for k = 1, #chain, 1 do
+							game.board[chain[k].y][chain[k].x] |= remove_flag
+							game.board[chain[k].y][chain[k].x] |= chains[d]
+							add(to_remove, chain[k])
+						end
+					end
+				end
+			end
+		end
+	end
+	if (#to_remove > 0) then
+		game.state = 2
+	else
+		game.state = 0
+	end
+end
+
+-- breaks with infinite loop?
+function animate_removal()
+	animation_countdown.subtract(1)
+	animation.add(1)
+	if (animation_countdown.is_finished()) then
+		printh("start removal")
+		while (#to_remove > 0) do
+			printh(#to_remove)
+			local adj = find_adjacent(to_remove[1].x, to_remove[1].y, 1, false)
+			if (adj) then
+				printh("current: " .. to_remove[1].x .. " " .. to_remove[1].y)
+				printh("adjacent: " .. adj.x .. " " .. adj.y)
+				game.board[to_remove[1].y][to_remove[1].x] = game.board[adj.y][adj.x] & color_mask
+				if (not is_set(game.board[adj.y][adj.x], remove_flag)) then
+					printh("removing current, adding adj")
+					deli(to_remove, 1)
+					add(to_remove, adj, 1)
+				end
+			else
+				printh("removing current, setting to 0")
+				game.board[to_remove[1].y][to_remove[1].x] = 0
+				deli(to_remove, 1)
+			end
+		end
+		game.state = 1
+	end
+end
+
 function reset_game()
 	animation = make_cursor(6)
 	animation_countdown = make_countdown(30)
@@ -205,179 +391,12 @@ end
 function update_game()
 	-- block is falling
 	if (game.state == 0) then
-		if (game.board[1][4] != 0) then
-			game.over = true
-			return
-		end
-
-		-- if no drop countdown (game/level just started)
-		if (drop_countdown == nil) then
-			drop_countdown = make_countdown(flr(-3 * game.level + 31))
-		end
-		-- if current active tile is invalid
-		if (not game.active.valid) then
-			-- move next to active, make new next
-			game.active = game.next
-			game.next = make_blocks(special_countdown.is_finished(), true)
-			return
-		end
-
-		-- if press up
-		if (btnp(⬆️)) then
-			-- hard drop
-			while (game.active.valid) do
-				game.active.movey(true)
-			end
-		end
-
-		-- if tile is at bottom
-		if (drop_countdown.is_finished()) then
-			-- move block down, get if lockable
-			local lockable = game.active.movey()
-			-- if lock timer expired, lock
-			if (lockable) then
-				if (lock_countdown.is_finished()) game.active.lock()
-			-- if not lockable, reset lock timer
-			else
-				lock_countdown.reset()
-			end
-		end
-
-		-- if block is on ground, subtract lock timer every frame
-		if (game.active.movey(false, true)) then
-			lock_countdown.subtract(1)
-		-- if block is in air, reset lock timer
-		else
-			lock_countdown.reset()
-		end
-
-		-- subtract drop timer every frame
-		drop_countdown.subtract(1)
-
-		-- rotate
-		if (btnp(❎)) then
-			game.active.rotate()
-		elseif (btnp(🅾️)) then
-			game.active.rotate_reverse()
-		end
-
-		-- if button pressed for first time
-		-- mark as held, and do action
-		if (btn(➡️) and not right_held) then
-			game.active.movex(1)
-			right_held = true
-		elseif (btn(⬅️) and not left_held) then
-			game.active.movex(-1)
-			left_held = true
-		elseif (btn(⬇️) and not down_held) then
-			game.active.movey(true)
-			drop_countdown.reset()
-			down_held = true
-		end
-
-		-- if button released, but was held last frame
-		-- mark as unheld and reset arr
-		if (not btn(➡️) and right_held) then
-			right_held = false
-			arr.reset()
-		elseif (not btn(⬅️) and left_held) then
-			left_held = false
-			arr.reset()
-		elseif (not btn(⬇️) and down_held) then
-			down_held = false
-			arr.reset()
-		end
-
-		-- if button pressed and was held last frame
-		if (btn(➡️) and right_held) then
-			arr.subtract(1)
-			if (arr.is_finished()) game.active.movex(1)
-		elseif (btn(⬅️) and left_held) then
-			arr.subtract(1)
-			if (arr.is_finished()) game.active.movex(-1)
-		elseif (btn(⬇️) and down_held) then
-			arr.subtract(1)
-			if (arr.is_finished()) then
-				game.active.movey(true)
-				drop_countdown.reset()
-			end
-		end
+		move_blocks()
 	elseif (game.state == 1) then
-		-- for every tile
-		-- starting from bottom left
-		for i = game.height, 1, -1 do -- height starts from bottom for matching chains
-			for j = 1, game.width, 1 do
-				-- if tile is a color
-				if ((game.board[i][j] & color_mask) > 0) then
-					-- for each chain direction
-					for d = 1, 4, 1 do
-						-- chain elements
-						local chain = {{x=j, y=i, color=game.board[i][j] & color_mask}}
-						-- continue until chain is broken
-						while (true) do
-							-- if chain is not already part of chain in direction
-							if (not is_set(game.board[chain[1].y][chain[1].x], chains[d])) then
-								-- get adjacent
-								local adj = find_adjacent(chain[1].x, chain[1].y, d, false)
-								if (adj) then
-									-- get adjacent color
-									adj.color = game.board[adj.y][adj.x] & color_mask
-									-- if colors match, add to chain
-									if (chain[1].color == adj.color) then
-										add(chain, adj, 1)
-									else
-										-- break if colors don't match
-										break
-									end
-								else
-									-- break if adjacent is invalid
-									break
-								end
-							else
-								-- break if chain in this direction already found
-								break
-							end
-						end
-
-						-- if 3 in a row or more found
-						if (#chain >= 3) then
-							for k = 1, #chain, 1 do
-								game.board[chain[k].y][chain[k].x] |= remove_flag
-								game.board[chain[k].y][chain[k].x] |= chains[d]
-								add(to_remove, chain[k])
-							end
-						end
-					end
-				end
-			end
-		end
-		if (#to_remove > 0) then
-			game.state = 2
-		else
-			game.state = 0
-		end
+		find_chains()
 	-- flashing objects
 	elseif (game.state == 2) then
-		animation_countdown.subtract(1)
-		animation.add(1)
-		if (animation_countdown.is_finished()) then
-			while (#to_remove > 0) do
-				-- printh(#to_remove .. " " .. to_remove[1].x .. " " .. to_remove[1].y)
-				local adj = find_adjacent(to_remove[1].x, to_remove[1].y, 1, false)
-				if (adj) then
-					game.board[to_remove[1].y][to_remove[1].x] = game.board[adj.y][adj.x] & color_mask
-					-- printh(game.board[adj.y][adj.x] & remove_flag)
-					if (not is_set(game.board[adj.y][adj.x], remove_flag)) then
-						deli(to_remove, 1)
-						add(to_remove, adj, 1)
-					end
-				else
-					game.board[to_remove[1].y][to_remove[1].x] = 0
-					deli(to_remove, 1)
-				end
-			end
-			game.state = 1
-		end
+		animate_removal()
 	end
 
 	-- tmp return to menu
