@@ -310,6 +310,9 @@ function animate_removal()
 					printh("removing current, adding adj")
 					deli(to_remove, 1)
 					add(to_remove, adj, 1)
+				else
+					game.board[to_remove[1].y][to_remove[1].x] = 0
+					deli(to_remove, 1)
 				end
 			else
 				printh("removing current, setting to 0")
