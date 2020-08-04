@@ -1,6 +1,10 @@
 -- game board
 -- game_screen 3
 
+function is_set(val, bitw)
+	return (val & bitw) == bitw
+end
+
 function find_adjacent(x, y, d, collision)
 	local adj = {}
 	adj.x = x + dx[d]
@@ -131,8 +135,10 @@ function draw_tile(x, y, val)
 	spr(val, 4 * x + 16, 4 * y + 4, .5, .5)
 end
 
-
 function reset_game()
+	animation = make_cursor(6)
+	animation_countdown = make_countdown(30)
+
 	to_remove = {}
 
 	-- was button held
@@ -142,7 +148,6 @@ function reset_game()
 	-- auto repeat rate
 	-- frames between repeats
 	arr = make_countdown(5)
-	rep = false
 
 	special_countdown = make_countdown(100)
 	level_countdown = make_countdown(100)
@@ -180,14 +185,20 @@ function reset_game()
 end
 
 function init_game()
+	-- up, up right, right, down right, down, down left, left, up left
 	dy = {-1, -1, 0, 1, 1, 1, 0, -1}
 	dx = {0, 1, 1, 1, 0, -1, -1, -1}
 
-	to_remove = 0x80
-	chain_up = 0x40
+	remove_flag = 0x80
+
+	chain_u = 0x40
 	chain_ur = 0x20
 	chain_r = 0x10
 	chain_dr = 0x08
+
+	chains = {chain_u, chain_ur, chain_r, chain_dr}
+	all_chains = (chain_u | chain_ur | chain_r | chain_dr)
+
 	color_mask = 0x07
 end
 
@@ -292,7 +303,81 @@ function update_game()
 			end
 		end
 	elseif (game.state == 1) then
-		game.state = 0
+		-- for every tile
+		-- starting from bottom left
+		for i = game.height, 1, -1 do -- height starts from bottom for matching chains
+			for j = 1, game.width, 1 do
+				-- if tile is a color
+				if ((game.board[i][j] & color_mask) > 0) then
+					-- for each chain direction
+					for d = 1, 4, 1 do
+						-- chain elements
+						local chain = {{x=j, y=i, color=game.board[i][j] & color_mask}}
+						-- continue until chain is broken
+						while (true) do
+							-- if chain is not already part of chain in direction
+							if (not is_set(game.board[chain[1].y][chain[1].x], chains[d])) then
+								-- get adjacent
+								local adj = find_adjacent(chain[1].x, chain[1].y, d, false)
+								if (adj) then
+									-- get adjacent color
+									adj.color = game.board[adj.y][adj.x] & color_mask
+									-- if colors match, add to chain
+									if (chain[1].color == adj.color) then
+										add(chain, adj, 1)
+									else
+										-- break if colors don't match
+										break
+									end
+								else
+									-- break if adjacent is invalid
+									break
+								end
+							else
+								-- break if chain in this direction already found
+								break
+							end
+						end
+
+						-- if 3 in a row or more found
+						if (#chain >= 3) then
+							for k = 1, #chain, 1 do
+								game.board[chain[k].y][chain[k].x] |= remove_flag
+								game.board[chain[k].y][chain[k].x] |= chains[d]
+								add(to_remove, chain[k])
+							end
+						end
+					end
+				end
+			end
+		end
+		if (#to_remove > 0) then
+			game.state = 2
+		else
+			game.state = 0
+		end
+	-- flashing objects
+	elseif (game.state == 2) then
+		animation_countdown.subtract(1)
+		animation.add(1)
+		if (animation_countdown.is_finished()) then
+			while (#to_remove > 0) do
+				-- printh(#to_remove .. " " .. to_remove[1].x .. " " .. to_remove[1].y)
+				local adj = find_adjacent(to_remove[1].x, to_remove[1].y, 1, false)
+				if (adj) then
+					game.board[to_remove[1].y][to_remove[1].x] = game.board[adj.y][adj.x] & color_mask
+					-- printh(game.board[adj.y][adj.x] & remove_flag)
+					if (not is_set(game.board[adj.y][adj.x], remove_flag)) then
+						deli(to_remove, 1)
+						add(to_remove, adj, 1)
+					end
+				else
+					game.board[to_remove[1].y][to_remove[1].x] = 0
+					deli(to_remove, 1)
+				end
+			end
+			game.state = 1
+		end
 	end
 
 	-- tmp return to menu
@@ -336,7 +421,11 @@ function draw_game()
 
 	for i = 1, game.height, 1 do
 		for j = 1, game.width, 1 do
-			draw_tile(j, i, game.board[i][j] & color_mask)
+			if (game.state == 2 and is_set(game.board[i][j], remove_flag)) then
+				draw_tile(j, i, animation.selected)
+			else
+				draw_tile(j, i, game.board[i][j] & color_mask)
+			end
 		end
 	end
 end
