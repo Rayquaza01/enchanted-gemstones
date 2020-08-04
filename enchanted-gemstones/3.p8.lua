@@ -33,6 +33,21 @@ function set_add(tbl, v, i)
 	add(tbl, v, i)
 end
 
+function insertion_sort(tbl)
+	for i = 1, #tbl, 1 do
+		local j = i
+		while (j > 1 and tbl[j - 1] > tbl[j]) do
+			local tmp = tbl[j]
+			tbl[j] = tbl[j - 1]
+			tbl[j - 1] = tmp
+
+			j -= 1
+		end
+	end
+
+	return tbl
+end
+
 function find_adjacent(x, y, d, collision)
 	local adj = {}
 	adj.x = x + dx[d]
@@ -376,6 +391,7 @@ function animate_removal()
 	-- end
 	if (animation_countdown.is_finished()) then
 		-- printh("start removal")
+		to_remove = insertion_sort(to_remove)
 		while (#to_remove > 0) do
 			-- printh(#to_remove)
 			local current = decode_pos(to_remove[1])
