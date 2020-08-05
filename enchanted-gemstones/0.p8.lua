@@ -75,10 +75,12 @@ function make_countdown(n)
 	this.max = n
 	-- current value
 	this.val = n
+	-- is enabled
+	this.enabled = true
 
 	-- subtract s from current value
 	this.subtract = function(s)
-		this.val -= s
+		if (this.enabled) this.val -= s
 	end
 
 	-- reset current value to max
@@ -88,10 +90,9 @@ function make_countdown(n)
 
 	-- if current value less than 0, reset countdown
 	-- and return true
-	this.is_finished = function(reset)
-		if (reset == nil) reset = true
+	this.is_finished = function()
 		if (this.val <= 0) then
-			if (reset) this.reset()
+			this.reset()
 			return true
 		end
 		return false
