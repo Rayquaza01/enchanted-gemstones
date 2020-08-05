@@ -136,12 +136,17 @@ function save_scores()
 	for m = 1, 2, 1 do
 		local offset = score_offsets[m]
 		for i = 0, 19, 1 do
-			local idx = flr(1 / 4) + 1
+			local idx = flr(i / 4) + 1
 			local charidx = i % 4
 			if (charidx < 3) then
-				dset(i + offset, char_to_num(sub(scores[m][idx].name, charidx + 1, charidx + 1)))
+				local char = char_to_num(sub(scores[m][idx].name, charidx + 1, charidx + 1))
+				dset(i + offset, char)
+				printh(idx)
+				printh("saving " .. char .. " in " .. i + offset)
 			else
 				dset(i + offset, scores[m][idx].score)
+				printh(idx)
+				printh("saving " .. scores[m][idx].score .. " in " .. i + offset)
 			end
 		end
 	end
