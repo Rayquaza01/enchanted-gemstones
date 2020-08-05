@@ -373,6 +373,10 @@ function animate_removal()
 	end
 end
 
+function game_over()
+	-- if (btnp(🅾️) or btnp(❎)) game_screen = 1
+end
+
 function reset_game()
 	animation = make_cursor(6)
 	animation_countdown = make_countdown(30)
@@ -437,7 +441,6 @@ function init_game()
 	chain_dr = 0x08
 
 	chains = {chain_u, chain_ur, chain_r, chain_dr}
-	all_chains = (chain_u | chain_ur | chain_r | chain_dr)
 
 	color_mask = 0x07
 end
@@ -452,7 +455,7 @@ function update_game()
 	elseif (game.state == 2) then
 		animate_removal()
 	elseif (game.state == 3 or game.state == 4) then
-		-- if (btnp(🅾️) or btnp(❎)) game_screen = 1
+		game_over()
 	end
 
 	-- tmp return to menu
@@ -464,7 +467,9 @@ function draw_game()
 
 	-- high score
 	print("★", 2, 1, 10)
-	print(left_pad(tostr(scores[game.mode + 1][1].score), 5, "0"), 10, 1, 10)
+	local hs = scores[game.mode + 1][1].score
+	if (game.score > hs) hs = game.score
+	print(left_pad(tostr(hs), 5, "0"), 10, 1, 10)
 
 	-- current score
 	print(left_pad(tostr(game.score), 5, "0"), 43, 1, 7)
@@ -495,7 +500,7 @@ function draw_game()
 	end
 
 	for i = 3, game.height, 1 do
-		for j = 1, game.width, 1 do
+	for j = 1, game.width, 1 do
 			if (game.state == 2 and is_set(game.board[i][j], remove_flag)) then
 				draw_tile(j, i, animation.selected + 1)
 			else
@@ -505,6 +510,15 @@ function draw_game()
 	end
 
 	if (game.state > 2) then
-		print("game\nover", 1, 24, 7)
+		for i = 1, 3, 1 do
+			for j = 1, 2, 1 do
+				spr(24, 12 + 8 * i, 18 + 8 * j)
+			end
+		end
+		if (game.state == 3) then
+			print("game\nover", 24, 28, 7)
+		elseif (game.state == 4) then
+			print("you\nwin!", 24, 28, 7)
+		end
 	end
 end
