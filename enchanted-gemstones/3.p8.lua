@@ -131,7 +131,7 @@ end
 --game state 0
 function move_blocks()
 	if (game.board[3][4] != 0) then
-		game.state = 3
+		end_game()
 		return
 	end
 
@@ -319,7 +319,7 @@ function find_chains()
 		if (game.level > 19) then
 			-- end game after beating level 10 on marathon
 			if (game.mode == 0) then
-				game.state = 4
+				end_game(true)
 				return
 			end
 			game.level = 19
@@ -373,8 +373,25 @@ function animate_removal()
 	end
 end
 
+function end_game(win)
+	game.state = win and 4 or 3
+
+	-- find position of new high score
+	for i = 5, 1, 1 do
+		if (game.score >= scores[game.mode + 1][i]) new_high_score = i
+	end
+end
+
 function game_over()
-	-- if (btnp(🅾️) or btnp(❎)) game_screen = 1
+	if (btnp(🅾️) or btnp(❎)) then
+		-- go to high score screen if new high score
+		if (new_high_score > 0) then
+			game_screen = 4
+		-- otherwise, return to menu
+		else
+			game_screen = 1
+		end
+	end
 end
 
 function reset_game()
@@ -394,6 +411,8 @@ function reset_game()
 	special_countdown = make_countdown(25)
 	drop_countdown = nil
 	lock_countdown = make_countdown(30)
+
+	new_high_score = 0
 
 	game = {}
 	game.width = 6
@@ -457,9 +476,6 @@ function update_game()
 	elseif (game.state == 3 or game.state == 4) then
 		game_over()
 	end
-
-	-- tmp return to menu
-	-- if (btnp(🅾️) or btnp(❎)) game_screen = 1
 end
 
 function draw_game()
