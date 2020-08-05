@@ -106,21 +106,6 @@ function make_countdown(n)
 	return this
 end
 
-function insertion_sort(tbl)
-	for i = 1, #tbl, 1 do
-		local j = i
-		while (j > 1 and tbl[j - 1] > tbl[j]) do
-			local tmp = tbl[j]
-			tbl[j] = tbl[j - 1]
-			tbl[j - 1] = tmp
-
-			j -= 1
-		end
-	end
-
-	return tbl
-end
-
 function left_pad(s, len, append)
 	if (#s >= len) return s
 

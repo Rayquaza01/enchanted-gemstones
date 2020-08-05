@@ -20,10 +20,18 @@ function decode_pos(pos)
 	return res
 end
 
-function set_add(tbl, v, i)
-	if (i == nil) i = #tbl + 1
-	if (index_of(tbl, v) > 0) return
-	add(tbl, v, i)
+function set_add(tbl, v)
+	-- default pos at end of list
+	local pos = #tbl + 1
+	-- for each item in list
+	for i = #tbl, 1, -1 do
+		-- if item already in list, return early
+		-- each item can only be in list once
+		if (tbl[i] == v) return
+		-- insert position is sorted
+		if (v < tbl[i]) pos = i
+	end
+	add(tbl, v, pos)
 end
 
 function find_adjacent(x, y, d, collision)
@@ -348,7 +356,6 @@ function animate_removal()
 	-- 	animation.add(1)
 	-- end
 	if (animation_countdown.is_finished()) then
-		to_remove = insertion_sort(to_remove)
 		while (#to_remove > 0) do
 			local current = decode_pos(to_remove[1])
 			local adj = find_adjacent(current.x, current.y, 1, false)
@@ -356,7 +363,7 @@ function animate_removal()
 				game.board[current.y][current.x] = game.board[adj.y][adj.x] & color_mask
 				deli(to_remove, 1)
 				game.board[adj.y][adj.x] |= remove_flag
-				set_add(to_remove, encode_pos(adj.y, adj.x), 1)
+				set_add(to_remove, encode_pos(adj.y, adj.x))
 			else
 				game.board[current.y][current.x] = 0
 				deli(to_remove, 1)
