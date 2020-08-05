@@ -49,7 +49,7 @@ function make_blocks(special, valid)
 
 	-- block starting position (bottom block)
 	this.x = 4
-	this.y = 1
+	this.y = 3
 
 	-- if blocks are still movable
 	this.valid = valid
@@ -73,6 +73,7 @@ function make_blocks(special, valid)
 				current = find_adjacent(current.x, current.y, 1, false)
 			end
 		end
+		if (this.blocks[1] == 7) special_countdown.enabled = false
 		game.active.valid = false
 		game.state = 1
 	end
@@ -122,38 +123,34 @@ end
 -- draw tile on board
 -- co-ords based on game.board
 function draw_tile(x, y, val)
-	if (val == 0) return
-	spr(val, 4 * x + 16, 4 * y + 4, .5, .5)
+	if (y < 3) return -- don't show tiles above playfield
+	if (val == 0) return -- don't show blank tiles
+	spr(val, 4 * x + 16, 4 * y - 4, .5, .5)
 end
 
 --game state 0
 function move_blocks()
-	if (game.board[1][4] != 0) then
+	if (game.board[3][4] != 0) then
 		game.state = 3
 		return
 	end
 
-	if (reset_special) then
-		special_countdown.reset()
-		reset_special = false
-	end
-
 	-- if no drop countdown (game/level just started)
 	if (drop_countdown == nil) then
-		drop_countdown = make_countdown(flr(-3 * game.level + 31))
+		drop_countdown = make_countdown(-3 * game.level + 60)
 	end
 	-- if current active tile is invalid
 	if (not game.active.valid) then
 		-- move next to active, make new next
+		local use_special = special_countdown.is_finished()
+
 		game.active = game.next
-		if (special_countdown.is_finished()) then
-			printh("special")
-			game.next = make_blocks(true, true)
-		else
-			game.next = make_blocks(false, true)
-		end
+		game.next = make_blocks(use_special, true)
+		use_special = false
 		return
 	end
+
+	special_countdown.enabled = true
 
 	-- if press up
 	if (btnp(⬆️)) then
@@ -319,13 +316,13 @@ function find_chains()
 	if (game.gems >= game.level_thresholds[game.level + 1]) then
 		drop_countdown = nil
 		game.level += 1
-		if (game.level > 9) then
+		if (game.level > 19) then
 			-- end game after beating level 10 on marathon
 			if (game.mode == 0) then
 				game.state = 4
 				return
 			end
-			game.level = 9
+			game.level = 19
 		end
 	end
 
@@ -334,7 +331,6 @@ function find_chains()
 		game.score += new_score
 		-- prevent score from underflowing
 		if (game.score < 0) game.score = 32767
-		if (special_countdown.is_finished(false)) reset_special = true
 		special_countdown.subtract(new_score)
 
 		game.state = 2
@@ -392,13 +388,12 @@ function reset_game()
 	arr = make_countdown(5)
 
 	special_countdown = make_countdown(25)
-	reset_special = false
 	drop_countdown = nil
 	lock_countdown = make_countdown(30)
 
 	game = {}
 	game.width = 6
-	game.height = 13
+	game.height = 15
 
 	game.active = make_blocks(false, false)
 	game.next = make_blocks()
@@ -413,7 +408,7 @@ function reset_game()
 	game.mode = mode
 	game.level = level
 	game.level_thresholds = {}
-	for i = 1, 10, 1 do
+	for i = 1, 20, 1 do
 		game.level_thresholds[i] = 50 * i
 	end
 	game.gems = 0
@@ -499,7 +494,7 @@ function draw_game()
 		end
 	end
 
-	for i = 1, game.height, 1 do
+	for i = 3, game.height, 1 do
 		for j = 1, game.width, 1 do
 			if (game.state == 2 and is_set(game.board[i][j], remove_flag)) then
 				draw_tile(j, i, animation.selected + 1)
