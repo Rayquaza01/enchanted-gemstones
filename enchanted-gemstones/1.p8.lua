@@ -1,6 +1,14 @@
 -- main menu
 -- game_screen 1
 
+function change_screen(gs)
+	if (gs == 3) then
+		reset_game()
+	end
+
+	game_screen = gs
+end
+
 function menu_cursor(n)
 	local this = make_cursor(n)
 

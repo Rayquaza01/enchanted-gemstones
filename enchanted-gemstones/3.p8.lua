@@ -275,13 +275,11 @@ function find_chains()
 
 					-- if 3 in a row or more found
 					if (#chain >= 3) then
-						printh("Found chain:")
 						for k = 1, #chain, 1 do
 							game.board[chain[k].y][chain[k].x] |= remove_flag
 							game.board[chain[k].y][chain[k].x] |= chains[d]
 							local pos = encode_pos(chain[k].y, chain[k].x)
 							set_add(to_remove, pos)
-							printh(" " .. pos .. " " .. game.board[chain[k].y][chain[k].x])
 						end
 					end
 				end
@@ -350,21 +348,16 @@ function animate_removal()
 	-- 	animation.add(1)
 	-- end
 	if (animation_countdown.is_finished()) then
-		-- printh("start removal")
 		to_remove = insertion_sort(to_remove)
 		while (#to_remove > 0) do
-			-- printh(#to_remove)
 			local current = decode_pos(to_remove[1])
 			local adj = find_adjacent(current.x, current.y, 1, false)
 			if (adj) then
 				game.board[current.y][current.x] = game.board[adj.y][adj.x] & color_mask
-				printh("removing current, adding adj")
-				printh(game.board[current.y][current.x])
 				deli(to_remove, 1)
 				game.board[adj.y][adj.x] |= remove_flag
 				set_add(to_remove, encode_pos(adj.y, adj.x), 1)
 			else
-				-- printh("removing current, setting to 0")
 				game.board[current.y][current.x] = 0
 				deli(to_remove, 1)
 			end
@@ -377,8 +370,8 @@ function end_game(win)
 	game.state = win and 4 or 3
 
 	-- find position of new high score
-	for i = 5, 1, 1 do
-		if (game.score >= scores[game.mode + 1][i]) new_high_score = i
+	for i = 5, 1, -1 do
+		if (game.score >= scores[game.mode + 1][i].score) new_high_score = i
 	end
 end
 

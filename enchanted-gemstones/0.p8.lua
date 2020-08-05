@@ -24,8 +24,7 @@ function _init()
 	mode = 0
 	mode_text = {"marathon", " endless"}
 
-	name_cursor = make_cursor(3)
-	name_char_cursor = make_cursor(#lookup)
+	new_high_score = 0
 
 	frame_counter = make_cursor(30)
 
@@ -34,6 +33,8 @@ function _init()
 	init_high_scores()
 
 	init_game()
+
+	init_new_high_score()
 end
 
 
@@ -44,8 +45,10 @@ function _update()
 		update_menu()
 	elseif (game_screen == 2) then
 		update_high_scores()
-	elseif(game_screen == 3) then
+	elseif (game_screen == 3) then
 		update_game()
+	elseif (game_screen == 4) then
+		update_new_high_score()
 	end
 end
 
@@ -57,6 +60,8 @@ function _draw()
 		draw_high_scores()
 	elseif (game_screen == 3) then
 		draw_game()
+	elseif (game_screen == 4) then
+		draw_new_high_score()
 	end
 end
 
@@ -114,14 +119,6 @@ function insertion_sort(tbl)
 	end
 
 	return tbl
-end
-
-function change_screen(gs)
-	if (gs == 3) then
-		reset_game()
-	end
-
-	game_screen = gs
 end
 
 function left_pad(s, len, append)
