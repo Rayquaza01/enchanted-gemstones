@@ -141,12 +141,8 @@ function save_scores()
 			if (charidx < 3) then
 				local char = char_to_num(sub(scores[m][idx].name, charidx + 1, charidx + 1))
 				dset(i + offset, char)
-				printh(idx)
-				printh("saving " .. char .. " in " .. i + offset)
 			else
 				dset(i + offset, scores[m][idx].score)
-				printh(idx)
-				printh("saving " .. scores[m][idx].score .. " in " .. i + offset)
 			end
 		end
 	end
@@ -170,9 +166,11 @@ function load_scores()
 				if (scores[m][idx] == nil) scores[m][idx] = {name="", score=0}
 				-- add char to name
 				scores[m][idx].name = scores[m][idx].name .. num_to_char(dget(i + offset))
+				printh("loading " .. i + offset .. " " .. scores[m][idx].name)
 			-- if score
 			else
 				scores[m][idx].score = dget(i + offset)
+				printh("loading " .. i + offset .. " " .. scores[m][idx].score)
 			end
 		end
 	end
