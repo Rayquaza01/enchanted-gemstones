@@ -30,6 +30,8 @@ function set_add(tbl, v)
 		if (tbl[i] == v) return
 		-- insert position is sorted
 		if (v < tbl[i]) pos = i
+		-- break if passed correct position
+		if (v > tbl[i]) break
 	end
 	add(tbl, v, pos)
 end
@@ -378,14 +380,16 @@ function end_game(win)
 
 	-- find position of new high score
 	for i = 5, 1, -1 do
-		if (game.score >= scores[game.mode + 1][i].score) new_high_score = i
+		if (game.score >= scores[game.mode + 1][i].score) new_high_score_pos = i
 	end
+	new_high_score = game.score
+	new_high_score_mode = game.mode
 end
 
 function game_over()
 	if (btnp(🅾️) or btnp(❎)) then
 		-- go to high score screen if new high score
-		if (new_high_score > 0) then
+		if (new_high_score_pos > 0) then
 			game_screen = 4
 		-- otherwise, return to menu
 		else

@@ -24,6 +24,8 @@ function _init()
 	mode = 0
 	mode_text = {"marathon", " endless"}
 
+	new_high_score_pos = 0
+	new_high_score_mode = 0
 	new_high_score = 0
 
 	frame_counter = make_cursor(30)
