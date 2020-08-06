@@ -18,7 +18,7 @@ function update_new_high_score()
 
 	-- O advances cursor until last character
 	if (btnp(🅾️) and name_cursor.selected < 2) then
-		name_cursor.add()
+		name_cursor.add(1)
 		return
 	end
 
