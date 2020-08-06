@@ -16,6 +16,12 @@ function update_new_high_score()
 	if (btnp(➡️)) name_cursor.add(1)
 	if (btnp(⬅️)) name_cursor.add(-1)
 
+	-- O advances cursor until last character
+	if (btnp(🅾️) and name_cursor.selected < 2) then
+		name_cursor.add()
+		return
+	end
+
 	if (btnp(🅾️) or btnp(❎)) then
 		local s = {name="", score=new_high_score}
 		for i = 1, 3, 1 do
@@ -24,6 +30,8 @@ function update_new_high_score()
 
 		add(scores[new_high_score_mode + 1], s, new_high_score_pos)
 		deli(scores[new_high_score_mode + 1], 6)
+		-- set high score display to current mode
+		hs_cursor.selected = new_high_score_mode
 		save_scores()
 
 		game_screen = 2
