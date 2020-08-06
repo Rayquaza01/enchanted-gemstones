@@ -147,7 +147,8 @@ function move_blocks()
 
 	-- if no drop countdown (game/level just started)
 	if (drop_countdown == nil) then
-		drop_countdown = make_countdown(-3 * game.level + 60)
+		-- drop_countdown = make_countdown(-3 * game.level + 60)
+		drop_countdown = make_countdown(flr(-5 * (20 * (game.level - 10)) ^ (1 / 3) + 30))
 	end
 	-- if current active tile is invalid
 	if (not game.active.valid) then
