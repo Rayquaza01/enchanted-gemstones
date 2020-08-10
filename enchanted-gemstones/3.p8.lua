@@ -86,6 +86,8 @@ function make_blocks(special, valid)
 		if (this.blocks[1] == 7) special_countdown.enabled = false
 		game.active.valid = false
 		game.state = 1
+		-- locking sfx
+		sfx(1)
 	end
 
 	-- move left and right
@@ -342,6 +344,8 @@ function find_chains()
 		if (game.score < 0) game.score = 32767
 		special_countdown.subtract(new_score)
 
+		-- play removal sfx
+		sfx(2)
 		game.state = 2
 		game.multiplier += 1
 	else
@@ -385,6 +389,9 @@ function end_game(win)
 	end
 	new_high_score = game.score
 	new_high_score_mode = game.mode
+
+	-- game over sfx
+	sfx(3)
 end
 
 function game_over()
@@ -400,6 +407,8 @@ function game_over()
 end
 
 function reset_game()
+	sfx(0)
+
 	animation = make_cursor(6)
 	animation_countdown = make_countdown(30)
 
