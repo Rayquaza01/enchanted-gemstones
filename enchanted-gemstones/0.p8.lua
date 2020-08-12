@@ -7,10 +7,12 @@ function _init()
 	poke(0x5f2c, 3)
 	cls()
 
+	-- valid high score chars
 	lookup = "abcdefghijklmnopqrstuvwxyz0123456789!?. "
 
 	cartdata("r01-enchanted-gemstones")
 
+	-- load scores from storage
 	score_offsets = {1, 21}
 	scores = {{}, {}}
 	load_scores()
@@ -18,12 +20,14 @@ function _init()
 	-- 1: main menu
 	-- 2: high scores
 	-- 3: game
+	-- 4: new high score
 	game_screen = 1
 
 	level = 0
 	mode = 0
 	mode_text = {"marathon", " endless"}
 
+	-- vars for new high scores
 	new_high_score_pos = 0
 	new_high_score_mode = 0
 	new_high_score = 0
@@ -68,13 +72,6 @@ function _draw()
 end
 
 -- misc functions
-
-function index_of(tbl, val)
-	for i = 1, #tbl, 1 do
-		if (tbl[i] == val) return i
-	end
-	return 0
-end
 
 function make_countdown(n)
 	local this = {}
@@ -136,11 +133,14 @@ function save_scores()
 	for m = 1, 2, 1 do
 		local offset = score_offsets[m]
 		for i = 0, 19, 1 do
+			-- get the position
 			local idx = flr(i / 4) + 1
 			local charidx = i % 4
+			-- save chars
 			if (charidx < 3) then
 				local char = char_to_num(sub(scores[m][idx].name, charidx + 1, charidx + 1))
 				dset(i + offset, char)
+			-- save score
 			else
 				dset(i + offset, scores[m][idx].score)
 			end
@@ -181,6 +181,7 @@ function make_cursor(n)
 	this.selected = 0
 	this.length = n
 
+	-- increase position, roll over if passed length
 	this.add = function(d)
 		this.selected += d
 		this.selected %= this.length

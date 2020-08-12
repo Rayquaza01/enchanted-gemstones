@@ -1,6 +1,7 @@
 -- main menu
 -- game_screen 1
 
+-- change screen
 function change_screen(gs)
 	if (gs == 3) then
 		reset_game()
@@ -9,26 +10,8 @@ function change_screen(gs)
 	game_screen = gs
 end
 
-function menu_cursor(n)
-	local this = make_cursor(n)
-
-	this.get_x = function()
-		return (frame_counter.selected > 14) and 1 or 2
-	end
-
-	this.get_y = function()
-		return 22 + (6 * this.selected)
-	end
-
-	this.draw = function()
-		spr(8, this.get_x(), this.get_y(), .5, .5)
-	end
-
-	return this
-end
-
 function init_menu()
-	m_cursor = menu_cursor(4)
+	m_cursor = make_cursor(4)
 	menu_gem_colors = {9, 13}
 end
 
@@ -61,6 +44,7 @@ end
 
 function draw_menu()
 	map(0, 0)
+	-- randomize colors every second
 	if (frame_counter.selected == 15) then
 		menu_gem_colors[1] = roll_die() + 9
 		menu_gem_colors[2] = roll_die() + 9
@@ -71,7 +55,7 @@ function draw_menu()
 	print("gemstones", 10, 10, 7)
 	print("◆", 46, 10, menu_gem_colors[2])
 
-	m_cursor.draw()
+	spr(8, (frame_counter.selected > 14) and 1 or 2, 6 * m_cursor.selected + 22)
 
 	print("level", 6, 22, 7)
 	print(left_pad(tostr(level + 1), 2, "0"), 50, 22, 4)

@@ -46,14 +46,18 @@ function draw_new_high_score()
 	print(new_high_score_pos, 14, 19, 7 + new_high_score_pos)
 	print(left_pad(tostr(new_high_score), 5, "0"), 34, 19, 7 + new_high_score_pos)
 
+	print("enter your name:", 1, 25, 7)
+
 	local animation = frame_counter.selected > 14 and 1 or 0
 
+	-- left and right arrows on name
 	spr(8, 20 + animation, 37, .5, .5, true)
 	spr(8, 39 - animation, 37, .5, .5)
 
 	for i = 1, 3, 1 do
 		print(num_to_char(name_chars[i].selected), 4 * i + 22, 37, 7)
 		if (i == name_cursor.selected + 1) then
+			-- up and down arrows on name
 			spr(9, 4 * i + 21, 31 + animation, .5, .5, false, true)
 			spr(9, 4 * i + 21, 44 - animation, .5, .5)
 		end

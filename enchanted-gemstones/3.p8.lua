@@ -20,6 +20,7 @@ function decode_pos(pos)
 	return res
 end
 
+-- add to items to list in sorted order and only once per item
 function set_add(tbl, v)
 	-- default pos at end of list
 	local pos = #tbl + 1
@@ -36,6 +37,7 @@ function set_add(tbl, v)
 	add(tbl, v, pos)
 end
 
+-- find an adjacent tile
 function find_adjacent(x, y, d, collision)
 	local adj = {}
 	adj.x = x + dx[d]
@@ -46,7 +48,7 @@ function find_adjacent(x, y, d, collision)
 		return false
 	end
 
-	-- if adj is already filled
+	-- if collision is set, return false on already filled tiles
 	if (collision and ((game.board[adj.y][adj.x] & color_mask) > 0)) then
 		return false
 	end
@@ -530,7 +532,7 @@ function draw_game()
 	end
 
 	for i = 3, game.height, 1 do
-	for j = 1, game.width, 1 do
+		for j = 1, game.width, 1 do
 			if (game.state == 2 and is_set(game.board[i][j], remove_flag)) then
 				draw_tile(j, i, animation.selected + 1)
 			else
