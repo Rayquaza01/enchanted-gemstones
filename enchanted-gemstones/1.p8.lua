@@ -66,6 +66,8 @@ function draw_menu()
 	print("high scores", 6, 34, 7)
 	print("start game", 6, 40, 7)
 
+	print("joe jarvis  v1.0", 1, 53, 5)
+
 	print("lowrezjam 2020", 1, 59, 7)
 	print("♥", 57, 59, 8)
 end

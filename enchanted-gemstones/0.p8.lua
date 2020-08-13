@@ -1,5 +1,7 @@
---columns
+--enchanted gemstones
 --by joe jarvis
+--v1.0
+--https://github.com/rayquaza01/enchanted-gemstones
 
 function _init()
 	printh("--start--")
