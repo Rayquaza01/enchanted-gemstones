@@ -27,6 +27,20 @@ Every 25 points, a special multi color gem will be given. This gem, when placed 
 
 The game ends when you top out (a gem is locked in the 1st row, 4th column) or when you complete level 20 (marathon mode only).
 
+## Modes
+
+The game has two modes: **Marathon** and **Endless**. Marathon mode ends after beating level 20 (1000 gems broken total), or when you top out. Endless mode ends only when you top out.
+
+You can choose which mode you want on the main menu.
+
+## Levels
+
+The level increases by one every 50 gems broken. You can choose the starting level on the main menu. Using a different falling speed from the menu will not change the amounts of gems needed to pass each level. For example, if you started on level 15, you would still need 750 gems to get to level 16, and 1000 gems to beat endless.
+
+## High Scores
+
+5 high scores are saved for each mode along with three character names. When the game ends and you get a new high score for the mode you are playing, you will be taken to a screen where you can enter your name.
+
 # Links
 
  * [Itch page](https://rayquaza01.itch.io/enchanted-gemstones)
